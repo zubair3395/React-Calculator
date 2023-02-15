@@ -1,14 +1,13 @@
 import React from "react";
 import { useState } from "react";
-import { digits, oprators } from "./calculatorDigits";
+import { data } from "./calculatorDigits";
 export default function Calculator() {
   const [isClicked, setIsClicked] = useState(false);
   const [values, setValues] = useState({
-    num1: 0,
-    num2: 0,
-    total: null,
+    num1: "",
+    num2: "",
   });
-  const [operate, setOperate] = useState(null);
+  const [operate, setOperate] = useState("");
   const handleValues = (e) => {
     e.preventDefault();
     const { value } = e.target;
@@ -18,76 +17,95 @@ export default function Calculator() {
   };
   const handleResult = (e) => {
     e.preventDefault();
-    console.log(values.num1, values.num2);
     let tempRes = 0;
     if (operate === "+") {
-      tempRes = parseInt(values.num1) + parseInt(values.num2);
+      tempRes = parseFloat(values.num1) + parseFloat(values.num2);
     } else if (operate === "-") {
-      tempRes = parseInt(values.num1) - parseInt(values.num2);
+      tempRes = parseFloat(values.num1) - parseFloat(values.num2);
     } else if (operate === "/") {
-      tempRes = parseInt(values.num1) / parseInt(values.num2);
+      if (parseInt(values.num2) === 0) {
+        alert("Second number can't be zero"); 
+        window.location.reload();
+      } else {
+        tempRes = parseFloat(values.num1) / parseFloat(values.num2);
+      }
     } else if (operate === "*") {
-      tempRes = parseInt(values.num1) * parseInt(values.num2);
+      tempRes = parseFloat(values.num1) * parseFloat(values.num2);
     } else {
       tempRes = 0;
     }
-    setValues({ ...values, total: tempRes });
+    setValues({ ...values, num1: tempRes, num2: "" });
+    setIsClicked(false);
+    setOperate("");
+  };
+  const handleClear = (e) => {
+    e.preventDefault();
+    const tempArr = values.num1.slice(0, -1);
+    setValues({ ...values, num1: tempArr });
   };
   const handleOperation = (e) => {
+    setOperate("");
     e.preventDefault();
     setIsClicked(true);
     setOperate(e.target.value);
   };
-  const handleCancel = () => {
-    setValues({ num1: 0, num2: 0, total: null });
+  const handleCancel = (e) => {
+    e.preventDefault();
+    window.location.reload();
   };
   return (
     <div>
       <div className="container">
         <form action="" name="calc" className="calculator">
-          {!values.total ? (
-            <input
-              type="number"
-              className="value"
-              name="txt"
-              value={isClicked === false ? values.num1 : values.num2}
-              readOnly
-            />
-          ) : (
-            <input
-              type="number"
-              className="value"
-              name="txt"
-              value={values.total}
-              readOnly
-            />
-          )}
-
+          <input
+            type="number"
+            className="value"
+            name="txt"
+            value={values.num1 ? values.num1 : 0}
+            readOnly
+          />
+          <input
+            type="text"
+            className="value"
+            name="txt"
+            value={operate}
+            readOnly
+          />
+          <input
+            type="number"
+            className="value"
+            name="txt"
+            value={values.num2}
+            readOnly
+          />
           <button className="num clear" onClick={handleCancel}>
             <i>C</i>
           </button>
-          {digits.map((digit, index) => (
+          {data.digits.map((digit, index) => (
             <button
               key={index}
               className="num"
               onClick={handleValues}
-              value={digit}
+              value={digit.value}
             >
-              <i>{digit}</i>
+              <i>{digit.value}</i>
             </button>
           ))}
-          {oprators.map((oprator, index) => (
+          {data.oprators.map((oprator, index) => (
             <button
               key={index}
               className="num"
               onClick={handleOperation}
-              value={oprator}
+              value={oprator.operate}
             >
-              <i>{oprator}</i>
+              <i>{oprator.operate}</i>
             </button>
           ))}
           <button className="num equal clear" onClick={handleResult}>
             <i>=</i>
+          </button>
+          <button className="num equal clear" onClick={handleClear}>
+            <i>AC</i>
           </button>
         </form>
       </div>
